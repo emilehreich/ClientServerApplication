@@ -40,6 +40,9 @@ public class TCPClient {
     }
     
     private static boolean sendFile(DataOutputStream os, String filename) throws IOException{
+
+        boolean retval;
+
         if (filename.isEmpty()) {
             retval = false;
             
@@ -48,13 +51,37 @@ public class TCPClient {
             // Send the file itself
             FileInputStream fis = getFileReader(filename);
             if (fis != null){
-                os.send(fis)
+                int length = getFileLength(filename);
+                // byte[] content = fis.readNBytes(length);
+                long transfered = fis.transferTo(os);
+                if (length == transfered){
+                    retval = true;
+                }else{
+                    retval = false;
+                }
             }else{
                 retval = false;
             }
         }
             
         return retval;
+    }
+    private static void handleResponse(DataInputStream inFromServer) throws IOException {
+        
+        int num_values = 5;
+        System.out.println("There are " + num_values + " unique words in the document,→ \n");
+        for (int i = 0; i < num_values; i++) {
+            // Read the length of the word
+            int length = inFromServer.
+            // Allocate a big enough buffer for the word
+            byte[] bytearray = new byte[length];
+            // Actually read the word and convert it to a string
+            
+            String word = new String(bytearray);
+            // Read the number of occurrences
+            int times = ...
+            System.out.println(word + ": " + times);
+        }
     }
 
     public static void main(String argv[]) {
@@ -67,9 +94,9 @@ public class TCPClient {
 
         try {
             // Connect to the local server at 6789
-            private int local_server = 6790
-            clientSocket = new Socket("local Server", local_server)
-            inFromUser = ...
+            int port = 6790;
+            clientSocket = new Socket("local Server", port);
+            inFromUser = new BufferedReader(new InputStreamReader(System.in));
             outToServer = new DataOutputStream(clientSocket.getOutputStream());
             inFromServer = new DataInputStream(clientSocket.getInputStream());
             System.out.println("Connected to server");
