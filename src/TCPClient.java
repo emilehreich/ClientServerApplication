@@ -24,9 +24,8 @@ public class TCPClient {
     private static int getFileLength(String filename) {
 
         File file = new File(filename);
-        int length = (int) file.length();
 
-        return length;
+        return (int) file.length();
     }
     
     private static void printHashMap(Map<String, Integer> occurrences) {
@@ -52,13 +51,11 @@ public class TCPClient {
             FileInputStream fis = getFileReader(filename);
             if (fis != null){
                 int length = getFileLength(filename);
-                // byte[] content = fis.readNBytes(length);
-                long transfered = fis.transferTo(os);
-                if (length == transfered){
-                    retval = true;
-                }else{
-                    retval = false;
-                }
+                byte[] content = fis.readNBytes(length);
+                os.write(content);
+
+                System.out.println("sent");
+//                retval = length == transferred;
             }else{
                 retval = false;
             }
@@ -68,23 +65,28 @@ public class TCPClient {
     }
     private static void handleResponse(DataInputStream inFromServer) throws IOException {
         
-        int num_values = 5;
-        System.out.println("There are " + num_values + " unique words in the document,→ \n");
-        for (int i = 0; i < num_values; i++) {
-            // Read the length of the word
-            int length = inFromServer.
-            // Allocate a big enough buffer for the word
-            byte[] bytearray = new byte[length];
-            // Actually read the word and convert it to a string
-            
-            String word = new String(bytearray);
-            // Read the number of occurrences
-            int times = ...
-            System.out.println(word + ": " + times);
-        }
+//        int num_values = 5;
+//        System.out.println("There are " + num_values + " unique words in the document,→ \n");
+//        for (int i = 0; i < num_values; i++) {
+//            // Read the length of the word
+//            int length = inFromServer.
+//            // Allocate a big enough buffer for the word
+//            byte[] bytearray = new byte[length];
+//            // Actually read the word and convert it to a string
+//
+//            String word = new String(bytearray);
+//            // Read the number of occurrences
+//            int times = ...
+//            System.out.println(word + ": " + times);
+//        }
+        assert inFromServer != null;
+        byte[] in = inFromServer.readAllBytes();
+        System.out.println(new String(in));
+
+
     }
 
-    public static void main(String argv[]) {
+    public static void main(String argv[]) throws IOException {
 
         Socket clientSocket = null;
         BufferedReader inFromUser = null;
@@ -94,32 +96,40 @@ public class TCPClient {
 
         try {
             // Connect to the local server at 6789
-            int port = 6790;
-            clientSocket = new Socket("local Server", port);
+            int port = 6789;
+            clientSocket = new Socket("localhost",port);
             inFromUser = new BufferedReader(new InputStreamReader(System.in));
             outToServer = new DataOutputStream(clientSocket.getOutputStream());
             inFromServer = new DataInputStream(clientSocket.getInputStream());
             System.out.println("Connected to server");
 
-            do {
-                System.out.print("Enter a file name: ");
-                String filename = inFromUser.readLine();
-
-                // sendfile will notify us whether this is the final file or not
-                repeatFlag = sendFile(outToServer, filename);
-                if (repeatFlag == true) {
-                    // If we didn't send a file,
-                    // we don't need to wait for a response
-                    handleResponse(inFromServer);
-            }while(repeatFlag == true);
-
+            System.out.print("Enter a file name: ");
+            String filename = inFromUser.readLine();
+            sendFile(outToServer, filename);
+            handleResponse(inFromServer);
+//            do {
+//                System.out.print("Enter a file name: ");
+//                String filename = inFromUser.readLine();
+//
+//                // sendfile will notify us whether this is the final file or not
+//                repeatFlag = sendFile(outToServer, filename);
+//                if (repeatFlag == true) {
+//                    // If we didn't send a file,
+//                    // we don't need to wait for a response
+//                    handleResponse(inFromServer);
+//            }while(repeatFlag == true);
+//
         } catch (IOException ioex) {
             System.out.println("Failed to process request : " + ioex.getMessage());
         } finally {
             //Close all input/output/sockets
-        ...
+            assert inFromServer != null;
+            inFromServer.close();
+            inFromUser.close();
+            outToServer.close();
         }
-        
-        }
+
     }
+//    }
+
 }
