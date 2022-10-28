@@ -33,6 +33,7 @@ public class TCPClient {
             String key = name.toString();
             String value = occurrences.get(name).toString();
 
+//            commentaire
             System.out.println(key + " " + value);
         }
     
